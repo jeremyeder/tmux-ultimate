@@ -239,11 +239,13 @@ class TestErrorHandling:
             # Should not crash when passed invalid data
             try:
                 # This would test the actual config validation
-                assert (
-                    config is not None
+                # Each config should either be valid type or handled gracefully
+                is_valid = (
+                    config is None
                     or config == ""
                     or isinstance(config, (dict, list))
                 )
+                assert is_valid, f"Config {config} should be handled gracefully"
             except Exception as e:
                 pytest.fail(f"Unexpected exception with config {config}: {e}")
 

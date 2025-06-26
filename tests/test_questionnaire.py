@@ -159,10 +159,12 @@ class TestTmuxQuestionnaire:
         mock_file.assert_called_once()
 
     @patch("os.path.exists", return_value=True)
-    def test_save_config_file_exists(self, mock_exists):
-        """Test save fails when file exists"""
+    @patch("builtins.open", new_callable=mock_open)
+    def test_save_config_file_exists(self, mock_file, mock_exists):
+        """Test save succeeds when file exists (overwrites)"""
         result = self.questionnaire._save_config()
-        assert result is False
+        assert result is True
+        mock_file.assert_called_once()
 
 
 class TestIntegration:
@@ -177,7 +179,7 @@ class TestIntegration:
         mock_input.side_effect = [
             "2",  # prefix key: C-a
             "y",  # enable mouse
-            "6",  # color scheme: LFGM
+            "7",  # color scheme: LFGM (corrected index)
             "y",  # show time
             "y",  # show date
             "n",  # show hostname
@@ -185,14 +187,15 @@ class TestIntegration:
             "5000",  # history limit
             "n",  # automatic rename
             "y",  # renumber windows
-            "1",  # base index
-            "1",  # pane base index
-            "1",  # terminal mode: vi
+            "2",  # base index: 1 (option 2)
+            "2",  # terminal mode: vi (option 2)
             "y",  # 256 colors
             "y",  # true colors
             "y",  # vim navigation
             "y",  # vim copy mode
             "y",  # use TPM
+            "1,2,3",  # plugins selection
+            "n",  # enable pane synchronization
             "y",  # enable logging
         ]
 

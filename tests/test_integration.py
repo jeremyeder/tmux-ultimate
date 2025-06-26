@@ -22,7 +22,7 @@ class TestCompleteWorkflow:
         mock_responses = [
             "2",  # prefix: C-a
             "y",  # mouse support
-            "6",  # color scheme: LFGM
+            "7",  # color scheme: LFGM (corrected index)
             "y",  # show time
             "y",  # show date
             "n",  # show hostname
@@ -30,14 +30,15 @@ class TestCompleteWorkflow:
             "5000",  # history limit
             "n",  # automatic rename
             "y",  # renumber windows
-            "1",  # base index
-            "1",  # pane base index
-            "1",  # terminal mode: vi
+            "2",  # base index: 1 (option 2)
+            "2",  # terminal mode: vi (option 2)
             "y",  # 256 colors
             "y",  # true colors
             "y",  # vim navigation
             "y",  # vim copy mode
             "y",  # use TPM
+            "1,2,3",  # plugins selection
+            "n",  # enable pane synchronization
             "y",  # enable logging
         ]
 
@@ -329,7 +330,7 @@ class TestPerformance:
         """Test questionnaire completes in reasonable time"""
         import time
 
-        mock_responses = ["1"] * 20  # Answer 1 to all questions
+        mock_responses = ["1"] * 25  # Answer 1 to all questions with extra buffer
 
         start_time = time.time()
 
