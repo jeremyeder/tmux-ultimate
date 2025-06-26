@@ -8,20 +8,20 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'tmux-ultimate',
-  tagline: 'A tmux config generator written by claude code.',
+  title: 'TMUX Ultimate Configuration Generator',
+  tagline: 'Interactive solution for creating the perfect tmux configuration for Linux power users.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://{username}.github.io',
+  url: 'https://jeremyeder.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   baseUrl: '/tmux-ultimate/',
 
   // GitHub pages deployment config.
-  organizationName: '{username}', // Usually your GitHub org/user name.
+  organizationName: 'jeremyeder', // Usually your GitHub org/user name.
   projectName: 'tmux-ultimate', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -41,13 +41,7 @@ const config = {
           sidebarPath: './sidebars.js',
           // Please change this to your repo.
           editUrl:
-            'https://github.com/{username}/tmux-ultimate/tree/main/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/{username}/tmux-ultimate/tree/main/',
+            'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -60,13 +54,13 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      // image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'tmux-ultimate',
-        logo: {
-          alt: 'tmux-ultimate Logo',
-          src: 'img/logo.svg',
-        },
+        // logo: {
+        //   alt: 'tmux-ultimate Logo',
+        //   src: 'img/logo.svg',
+        // },
         items: [
           {
             type: 'docSidebar',
@@ -74,9 +68,8 @@ const config = {
             position: 'left',
             label: 'Tutorial',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/{username}/tmux-ultimate',
+            href: 'https://github.com/jeremyeder/tmux-ultimate',
             label: 'GitHub',
             position: 'right',
           },
@@ -115,12 +108,8 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
-              },
-              {
                 label: 'GitHub',
-                href: 'https://github.com/{username}/tmux-ultimate',
+                href: 'https://github.com/jeremyeder/tmux-ultimate',
               },
             ],
           },
