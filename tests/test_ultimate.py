@@ -118,21 +118,21 @@ class TestExistingConfigDetection:
         "os.path.exists", side_effect=lambda x: x == os.path.expanduser("~/.tmux.conf")
     )
     @patch("builtins.open", new_callable=mock_open, read_data="set -g prefix C-a")
-    @patch("builtins.input", side_effect=["2", "/tmp/test.conf"])  # Custom path option
+    @patch("builtins.input", side_effect=["2", "/tmp/test.conf"])  # Custom path option  # nosec
     @patch("os.access", return_value=True)
     def test_existing_config_custom_path(
         self, mock_access, mock_input, mock_file, mock_exists
     ):
         """Test existing config detection with custom path choice"""
         result = check_existing_tmux_config()
-        assert result == "/tmp/test.conf"
+        assert result == "/tmp/test.conf"  # nosec
 
     @patch(
         "os.path.exists", side_effect=lambda x: x == os.path.expanduser("~/.tmux.conf")
     )
     @patch("builtins.open", new_callable=mock_open, read_data="set -g prefix C-a")
     @patch(
-        "builtins.input", side_effect=["2", "", "/tmp/valid.conf"]
+        "builtins.input", side_effect=["2", "", "/tmp/valid.conf"]  # nosec
     )  # Empty then valid path
     @patch("os.access", return_value=True)
     def test_existing_config_invalid_then_valid_path(
@@ -140,7 +140,7 @@ class TestExistingConfigDetection:
     ):
         """Test existing config detection with invalid then valid custom path"""
         result = check_existing_tmux_config()
-        assert result == "/tmp/valid.conf"
+        assert result == "/tmp/valid.conf"  # nosec
 
 
 class TestArgumentParsing:
@@ -155,15 +155,15 @@ class TestArgumentParsing:
 
     def test_parse_arguments_custom_output(self):
         """Test custom output argument"""
-        with patch("sys.argv", ["tmux_ultimate.py", "-o", "/tmp/custom.conf"]):
+        with patch("sys.argv", ["tmux_ultimate.py", "-o", "/tmp/custom.conf"]):  # nosec
             args = parse_arguments()
-            assert args.output == "/tmp/custom.conf"
+            assert args.output == "/tmp/custom.conf"  # nosec
 
     def test_parse_arguments_long_output(self):
         """Test long form output argument"""
-        with patch("sys.argv", ["tmux_ultimate.py", "--output", "/tmp/custom.conf"]):
+        with patch("sys.argv", ["tmux_ultimate.py", "--output", "/tmp/custom.conf"]):  # nosec
             args = parse_arguments()
-            assert args.output == "/tmp/custom.conf"
+            assert args.output == "/tmp/custom.conf"  # nosec
 
 
 class TestMenuSystem:
@@ -199,8 +199,8 @@ class TestMainWorkflow:
         self, mock_args, mock_config_check, mock_deps, mock_version
     ):
         """Test main function initialization"""
-        mock_args.return_value = MagicMock(output="/tmp/test.conf")
-        mock_config_check.return_value = "/tmp/test.conf"
+        mock_args.return_value = MagicMock(output="/tmp/test.conf")  # nosec
+        mock_config_check.return_value = "/tmp/test.conf"  # nosec
 
         # Import main and test it can be called
         try:
