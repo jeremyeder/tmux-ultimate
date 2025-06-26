@@ -33,8 +33,8 @@ def print_banner():
 
 def check_python_version():
     """Check if Python version is compatible"""
-    if sys.version_info < (3, 6):
-        print("❌ Error: Python 3.6 or higher is required")
+    if sys.version_info < (3, 11):
+        print("❌ Error: Python 3.11 or higher is required")
         print(f"   Current version: {sys.version}")
         sys.exit(1)
 
@@ -293,7 +293,7 @@ Linux power user setup through an interactive questionnaire.
 🆘 TROUBLESHOOTING:
 • Make sure tmux is installed: sudo apt install tmux (or equivalent)
 • Check tmux version: tmux -V (2.6+ recommended)
-• Verify Python 3.6+: python3 --version
+• Verify Python 3.11+: python3 --version
 • For plugin issues, ensure TPM is properly installed
 
 📖 MORE RESOURCES:

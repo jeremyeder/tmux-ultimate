@@ -21,7 +21,7 @@ class TestUtilityFunctions:
     
     def test_check_python_version_compatible(self):
         """Test Python version check with compatible version"""
-        with patch('sys.version_info', (3, 8, 0)):
+        with patch('sys.version_info', (3, 11, 0)):
             # Should not raise SystemExit
             try:
                 check_python_version()
@@ -30,7 +30,7 @@ class TestUtilityFunctions:
     
     def test_check_python_version_incompatible(self):
         """Test Python version check with incompatible version"""
-        with patch('sys.version_info', (3, 5, 0)):
+        with patch('sys.version_info', (3, 10, 0)):
             with pytest.raises(SystemExit):
                 check_python_version()
     
