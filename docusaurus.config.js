@@ -21,7 +21,7 @@ const config = {
   organizationName: '{username}', // Usually your GitHub org/user name.
   projectName: 'tmux-ultimate', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
