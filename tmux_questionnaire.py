@@ -25,6 +25,7 @@ class ColorScheme(Enum):
     GRUVBOX = "gruvbox"
     SOLARIZED = "solarized"
     CATPPUCCIN = "catppuccin"
+    LFGM = "lfgm"
     CUSTOM = "custom"
 
 
@@ -435,29 +436,50 @@ class TmuxQuestionnaire:
             setattr(self.config, key, answer)
     
     def _ask_yes_no(self, question: str, default: bool = False, help_key: str = None) -> bool:
-        """Ask a yes/no question"""
+        """Ask a yes/no question with error handling"""
         default_str = "Y/n" if default else "y/N"
-        while True:
-            response = input(f"{question} [{default_str}] (? for help): ").strip().lower()
-            if response == '?' and help_key:
-                self._show_help(help_key)
-                continue
-            if not response:
-                return default
-            if response in ['y', 'yes']:
-                return True
-            if response in ['n', 'no']:
-                return False
-            print("Please enter 'y' or 'n' (or '?' for help)")
+        max_attempts = 5
+        attempt = 0
+        
+        while attempt < max_attempts:
+            try:
+                response = input(f"{question} [{default_str}] (? for help): ").strip().lower()
+                if response == '?' and help_key:
+                    self._show_help(help_key)
+                    continue
+                if not response:
+                    return default
+                if response in ['y', 'yes', '1', 'true']:
+                    return True
+                if response in ['n', 'no', '0', 'false']:
+                    return False
+                print("Please enter 'y' or 'n' (or '?' for help)")
+                attempt += 1
+            except (EOFError, KeyboardInterrupt):
+                print("\n\nOperation cancelled by user.")
+                raise KeyboardInterrupt("User cancelled operation")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                attempt += 1
+        
+        print(f"Too many invalid attempts. Using default: {'yes' if default else 'no'}")
+        return default
     
     def _ask_choice(self, question: str, choices: List[tuple], default: Any = None, help_key: str = None) -> Any:
-        """Ask a multiple choice question"""
+        """Ask a multiple choice question with error handling"""
+        if not choices:
+            print("Error: No choices provided")
+            return default
+            
         print(f"\n{question}")
         for i, (value, description) in enumerate(choices, 1):
             marker = " (default)" if value == default else ""
             print(f"  {i}. {description}{marker}")
         
-        while True:
+        max_attempts = 5
+        attempt = 0
+        
+        while attempt < max_attempts:
             try:
                 response = input(f"Choose option [1-{len(choices)}] (? for help): ").strip()
                 if response == '?' and help_key:

@@ -7,7 +7,119 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    
+    - name: Format check with black
+      run: |
+        black --check --diff .
+    
+    - name: Type check with mypy
+      run: |
+        mypy tmux_questionnaire.py tmux_generator.py tmux_ultimate.py --ignore-missing-imports
+    
+    - name: Security scan with bandit
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+        bandit -r . --severity-level medium
+    
+    - name: Run unit tests
+      run: |
+        pytest tests/ -v --cov=. --cov-report=xml --cov-report=term-missing
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/test_integration.py -v -m integration
+    
+    - name: Test LFGM theme implementation
+      run: |
+        python -c "
+        from tmux_questionnaire import TmuxQuestionnaire
+        from tmux_generator import TmuxConfigGenerator
+        
+        # Test LFGM theme in questionnaire
+        q = TmuxQuestionnaire()
+        colors = q._initialize_color_schemes()
+        assert 'lfgm' in colors
+        print('✓ LFGM theme found in questionnaire')
+        
+        # Test LFGM theme in generator
+        config = {'color_scheme': 'lfgm'}
+        g = TmuxConfigGenerator(config)
+        output = g.generate_config()
+        assert '#002d72' in output  # Mets blue
+        assert '#ff671f' in output  # Mets orange
+        print('✓ LFGM theme generates correctly')
+        "
+    
+    - name: Test config generation for all themes
+      run: |
+        python -c "
+        from tmux_generator import TmuxConfigGenerator
+        
+        themes = ['dracula', 'nord', 'gruvbox', 'solarized', 'catppuccin', 'lfgm']
+        for theme in themes:
+            config = {'color_scheme': theme}
+            generator = TmuxConfigGenerator(config)
+            output = generator.generate_config()
+            assert len(output) > 100
+            assert f'{theme.title()} Color Scheme' in output or f'{theme} Color Scheme' in output
+            print(f'✓ {theme} theme generates valid config')
+        "
+    
+    - name: Test safety features
+      run: |
+        python -c "
+        import tempfile
+        import os
+        from tmux_ultimate import check_output_file_safety, check_existing_tmux_config
+        
+        # Test safety check with non-existent file
+        with tempfile.TemporaryDirectory() as tmpdir:
+            test_file = os.path.join(tmpdir, 'test.conf')
+            assert check_output_file_safety(test_file) == True
+            print('✓ Safety check passes for non-existent file')
+            
+            # Create file and test safety check fails
+            with open(test_file, 'w') as f:
+                f.write('test')
+            assert check_output_file_safety(test_file) == False
+            print('✓ Safety check prevents overwrite of existing file')
+        "
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  docs-build:
     runs-on: ubuntu-latest
     
     steps:
@@ -29,10 +141,102 @@ jobs:
       run: |
         test -d build
         echo "Build directory created successfully"
+        
+        # Check for key pages
+        test -f build/index.html
+        test -f build/docs/intro/index.html
+        echo "Key documentation pages found"
     
-    # Optional: Add more checks here
-    # - name: Run tests
-    #   run: npm test
+    - name: Test documentation links
+      run: |
+        # Basic check that LFGM theme is mentioned in docs
+        grep -r "LFGM" build/ || echo "Warning: LFGM not found in built docs"
+        grep -r "New York Mets" build/ || echo "Warning: Mets reference not found"
+        
+        # Check that color previews are present
+        grep -r "color.*scheme" build/ || echo "Warning: Color scheme references not found"
+
+  end-to-end:
+    runs-on: ubuntu-latest
+    needs: [python-tests, docs-build]
     
-    # - name: Lint
-    #   run: npm run lint
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+    
+    - name: Test complete workflow
+      run: |
+        python -c "
+        import tempfile
+        import os
+        from unittest.mock import patch
+        from tmux_questionnaire import TmuxQuestionnaire
+        from tmux_generator import TmuxConfigGenerator
+        
+        # Simulate complete questionnaire workflow
+        mock_responses = [
+            '2',    # prefix: C-a
+            'y',    # mouse support
+            '6',    # color scheme: LFGM
+            'y',    # show time
+            'y',    # use TPM
+        ]
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_file = os.path.join(tmpdir, 'test.conf')
+            
+            with patch('builtins.input', side_effect=mock_responses):
+                with patch('os.path.exists', return_value=False):
+                    with patch('builtins.open') as mock_open:
+                        questionnaire = TmuxQuestionnaire()
+                        config = questionnaire.run_questionnaire()
+            
+            # Verify questionnaire results
+            assert config.prefix_key == 'C-a'
+            assert config.color_scheme == 'lfgm'
+            print('✓ Questionnaire completed successfully')
+            
+            # Generate configuration
+            config_dict = config.__dict__
+            generator = TmuxConfigGenerator(config_dict)
+            tmux_config = generator.generate_config()
+            
+            # Verify key elements in generated config
+            assert 'set -g prefix C-a' in tmux_config
+            assert '#002d72' in tmux_config  # Mets blue
+            assert '#ff671f' in tmux_config  # Mets orange
+            print('✓ Configuration generated successfully')
+            print('✓ LFGM theme included with correct colors')
+            print('✓ End-to-end workflow test passed')
+        "
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
