@@ -13,12 +13,12 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://{username}.github.io',
+  url: 'https://jeremyeder.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   baseUrl: '/tmux-ultimate/',
 
   // GitHub pages deployment config.
-  organizationName: '{username}', // Usually your GitHub org/user name.
+  organizationName: 'jeremyeder', // Usually your GitHub org/user name.
   projectName: 'tmux-ultimate', // Usually your repo name.
 
   onBrokenLinks: 'warn',
@@ -41,13 +41,13 @@ const config = {
           sidebarPath: './sidebars.js',
           // Please change this to your repo.
           editUrl:
-            'https://github.com/{username}/tmux-ultimate/tree/main/',
+            'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/{username}/tmux-ultimate/tree/main/',
+            'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -76,7 +76,7 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/{username}/tmux-ultimate',
+            href: 'https://github.com/jeremyeder/tmux-ultimate',
             label: 'GitHub',
             position: 'right',
           },
@@ -98,16 +98,16 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                label: 'Stack Overflow - TMUX',
+                href: 'https://stackoverflow.com/questions/tagged/tmux',
               },
               {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
+                label: 'TMUX Wiki',
+                href: 'https://github.com/tmux/tmux/wiki',
               },
               {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                label: 'TMUX Manual',
+                href: 'https://man.openbsd.org/tmux',
               },
             ],
           },
@@ -120,7 +120,7 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/{username}/tmux-ultimate',
+                href: 'https://github.com/jeremyeder/tmux-ultimate',
               },
             ],
           },
