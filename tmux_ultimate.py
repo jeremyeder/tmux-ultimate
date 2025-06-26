@@ -44,6 +44,7 @@ def check_dependencies():
     try:
         import json
         import dataclasses
+
         return True
     except ImportError as e:
         print(f"❌ Error: Missing required dependency: {e}")
@@ -70,6 +71,7 @@ def run_questionnaire():
     print("\n🚀 Starting Configuration Questionnaire...")
     try:
         from tmux_questionnaire import main as questionnaire_main
+
         return questionnaire_main()
     except ImportError:
         print("❌ Error: questionnaire module not found")
@@ -85,38 +87,38 @@ def generate_config(output_path: str = None):
     try:
         from tmux_generator import TmuxConfigGenerator
         import json
-        
-        config_json_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+
+        config_json_path = os.path.join(os.path.dirname(__file__), "tmux_config.json")
         if not os.path.exists(config_json_path):
             print("❌ Configuration file not found!")
             print("   Please run the questionnaire first.")
             return False
-        
+
         # Load configuration
-        with open(config_json_path, 'r') as f:
+        with open(config_json_path, "r") as f:
             config_data = json.load(f)
-        
+
         # Generate configuration
         generator = TmuxConfigGenerator(config_data)
         tmux_config = generator.generate_config()
-        
+
         # Determine output path
         if output_path is None:
-            output_path = os.path.join(os.path.dirname(__file__), 'tmux.conf')
-        
+            output_path = os.path.join(os.path.dirname(__file__), "tmux.conf")
+
         # Final safety check
         if os.path.exists(output_path):
             print(f"❌ Safety check failed: {output_path} already exists!")
             return False
-        
+
         # Save configuration
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(tmux_config)
-        
+
         print("🎉 TMUX configuration generated successfully!")
         print(f"📄 Configuration saved to: {output_path}")
         return True
-        
+
     except ImportError:
         print("❌ Error: generator module not found")
         return False
@@ -133,24 +135,24 @@ def view_configuration(output_path: str = "tmux.conf"):
         print(f"   Expected location: {config_file.absolute()}")
         print("   Please generate a configuration first.")
         return
-    
+
     print("\n📖 Current TMUX Configuration:")
     print("=" * 60)
     try:
-        with open(config_file, 'r') as f:
+        with open(config_file, "r") as f:
             content = f.read()
             # Show first 50 lines to avoid overwhelming output
-            lines = content.split('\n')
+            lines = content.split("\n")
             for i, line in enumerate(lines[:50], 1):
                 print(f"{i:3d}: {line}")
-            
+
             if len(lines) > 50:
                 print(f"... and {len(lines) - 50} more lines")
                 print(f"\nTotal lines: {len(lines)}")
-        
+
         print("=" * 60)
         print(f"📄 Full file available at: {config_file.absolute()}")
-        
+
     except Exception as e:
         print(f"❌ Error reading configuration: {e}")
 
@@ -158,24 +160,25 @@ def view_configuration(output_path: str = "tmux.conf"):
 def install_tpm_and_plugins():
     """Install TPM and configured plugins"""
     print("\n🔌 Installing TPM and Plugins...")
-    
+
     # Check if config exists to see what plugins are enabled
-    config_json_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+    config_json_path = os.path.join(os.path.dirname(__file__), "tmux_config.json")
     plugins = []
-    
+
     if os.path.exists(config_json_path):
         try:
             import json
-            with open(config_json_path, 'r') as f:
+
+            with open(config_json_path, "r") as f:
                 config_data = json.load(f)
-            plugins = config_data.get('plugins', [])
-            use_tpm = config_data.get('use_tpm', False)
-            
+            plugins = config_data.get("plugins", [])
+            use_tpm = config_data.get("use_tpm", False)
+
             if not use_tpm:
                 print("⚠️  TPM is not enabled in your configuration.")
                 print("   Please run the questionnaire and enable TPM first.")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Error reading configuration: {e}")
             return False
@@ -183,16 +186,18 @@ def install_tpm_and_plugins():
         print("❌ Configuration file not found!")
         print("   Please run the questionnaire first.")
         return False
-    
+
     try:
         # Install TPM
         tpm_dir = os.path.expanduser("~/.tmux/plugins/tpm")
         if not os.path.exists(tpm_dir):
             print("📦 Installing TPM (Tmux Plugin Manager)...")
-            result = subprocess.run([
-                "git", "clone", "https://github.com/tmux-plugins/tpm", tpm_dir
-            ], capture_output=True, text=True)
-            
+            result = subprocess.run(
+                ["git", "clone", "https://github.com/tmux-plugins/tpm", tpm_dir],
+                capture_output=True,
+                text=True,
+            )
+
             if result.returncode == 0:
                 print("✅ TPM installed successfully!")
             else:
@@ -200,21 +205,23 @@ def install_tpm_and_plugins():
                 return False
         else:
             print("✅ TPM already installed.")
-        
+
         # Show plugin installation instructions
         print(f"\n🔌 Plugins configured: {', '.join(plugins) if plugins else 'None'}")
-        
+
         if plugins:
             print("\n📝 To install plugins:")
             print("   1. Start tmux: tmux")
             print("   2. Press: Prefix + I  (that's Prefix + Shift + i)")
             print("   3. Wait for plugins to install")
             print("   4. Press: Prefix + r  (to reload config)")
-            
-            print("\n💡 Plugin installation is interactive and must be done from within tmux.")
-        
+
+            print(
+                "\n💡 Plugin installation is interactive and must be done from within tmux."
+            )
+
         return True
-        
+
     except subprocess.CalledProcessError as e:
         print(f"❌ Installation failed: {e}")
         return False
@@ -225,11 +232,8 @@ def install_tpm_and_plugins():
 
 def clean_files():
     """Clean generated files"""
-    files_to_clean = [
-        "tmux_config.json",
-        "tmux.conf"
-    ]
-    
+    files_to_clean = ["tmux_config.json", "tmux.conf"]
+
     cleaned = []
     for file in files_to_clean:
         if Path(file).exists():
@@ -238,7 +242,7 @@ def clean_files():
                 cleaned.append(file)
             except Exception as e:
                 print(f"❌ Error deleting {file}: {e}")
-    
+
     if cleaned:
         print(f"🧹 Cleaned files: {', '.join(cleaned)}")
     else:
@@ -319,29 +323,30 @@ Examples:
 
 Safety: This tool will NEVER overwrite existing tmux configurations.
 If the target file exists, the tool will warn you and exit safely.
-        """
+        """,
     )
-    
+
     parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         default=os.path.expanduser("~/.tmux.conf"),
-        help="Output file path (default: ~/.tmux.conf)"
+        help="Output file path (default: ~/.tmux.conf)",
     )
-    
+
     return parser.parse_args()
 
 
 def check_existing_tmux_config() -> str:
     """Check for existing tmux configuration and ask user what to do"""
     default_config_path = os.path.expanduser("~/.tmux.conf")
-    
+
     if os.path.exists(default_config_path):
         print(f"\n🔍 EXISTING TMUX CONFIGURATION DETECTED!")
         print(f"📁 Found: {default_config_path}")
-        
+
         # Show a preview of the existing config
         try:
-            with open(default_config_path, 'r') as f:
+            with open(default_config_path, "r") as f:
                 lines = f.readlines()[:5]  # Show first 5 lines
                 print(f"\n📄 Preview of existing configuration:")
                 for i, line in enumerate(lines, 1):
@@ -350,57 +355,57 @@ def check_existing_tmux_config() -> str:
                     print("   ...")
         except Exception:
             print("   (Unable to preview file)")
-        
+
         print(f"\n🤔 What would you like to do?")
         print(f"   1. 📦 Backup existing config and create new one")
         print(f"   2. 📝 Use a different output location")
         print(f"   3. 🚪 Exit (keep existing config unchanged)")
-        
+
         while True:
             try:
                 choice = input("\n🎯 Your choice (1-3): ").strip()
-                
-                if choice == '1':
+
+                if choice == "1":
                     backup_path = f"{default_config_path}.backup.{__import__('datetime').datetime.now().strftime('%Y%m%d_%H%M%S')}"
                     os.rename(default_config_path, backup_path)
                     print(f"✅ Existing config backed up to: {backup_path}")
                     return default_config_path
-                
-                elif choice == '2':
+
+                elif choice == "2":
                     while True:
                         new_path = input("\n📁 Enter new output path: ").strip()
                         if not new_path:
                             print("❌ Please enter a valid path")
                             continue
-                        
+
                         new_path = os.path.expanduser(new_path)
                         if os.path.exists(new_path):
                             print(f"❌ File already exists: {new_path}")
                             continue
-                        
+
                         # Check if directory exists and is writable
                         output_dir = os.path.dirname(new_path)
                         if output_dir and not os.path.exists(output_dir):
                             print(f"❌ Directory does not exist: {output_dir}")
                             continue
-                        
+
                         if output_dir and not os.access(output_dir, os.W_OK):
                             print(f"❌ Directory is not writable: {output_dir}")
                             continue
-                        
+
                         return new_path
-                
-                elif choice == '3':
+
+                elif choice == "3":
                     print("\n👋 Exiting to preserve your existing configuration.")
                     sys.exit(0)
-                
+
                 else:
                     print("❌ Please enter 1, 2, or 3")
-                    
+
             except KeyboardInterrupt:
                 print("\n\n👋 Goodbye!")
                 sys.exit(0)
-    
+
     return default_config_path
 
 
@@ -416,31 +421,31 @@ def check_output_file_safety(output_path: str) -> bool:
         print(f"   3. Choose a different filename")
         print(f"\n👋 Exiting safely to protect your existing configuration.")
         return False
-    
+
     # Check if directory exists and is writable
     output_dir = os.path.dirname(output_path)
     if output_dir and not os.path.exists(output_dir):
         print(f"❌ Output directory does not exist: {output_dir}")
         return False
-    
+
     if output_dir and not os.access(output_dir, os.W_OK):
         print(f"❌ Output directory is not writable: {output_dir}")
         return False
-    
+
     return True
 
 
 def main():
     """Main application entry point"""
     args = parse_arguments()
-    
+
     check_python_version()
-    
+
     if not check_dependencies():
         sys.exit(1)
-    
+
     print_banner()
-    
+
     # Check for existing config and get final output path
     if args.output == os.path.expanduser("~/.tmux.conf"):
         # Using default path, check for existing config
@@ -450,60 +455,60 @@ def main():
         if not check_output_file_safety(args.output):
             sys.exit(1)
         final_output = args.output
-    
+
     print(f"\n📄 Output file: {final_output}")
     print(f"🛡️  Safety verified: Ready to proceed\n")
-    
+
     # Update args with the final output path
     args.output = final_output
-    
+
     while True:
         show_menu()
-        
+
         try:
             choice = input("\n🎯 Enter your choice (1-8): ").strip()
-            
-            if choice == '1':
+
+            if choice == "1":
                 run_questionnaire()
-                
-            elif choice == '2':
+
+            elif choice == "2":
                 generate_config(args.output)
-                
-            elif choice == '3':
+
+            elif choice == "3":
                 print("\n🔄 Running Complete Setup...")
                 config = run_questionnaire()
                 if config:
-                    print("\n" + "="*50)
+                    print("\n" + "=" * 50)
                     generate_config(args.output)
-                
-            elif choice == '4':
+
+            elif choice == "4":
                 view_configuration(args.output)
-                
-            elif choice == '5':
+
+            elif choice == "5":
                 install_tpm_and_plugins()
-                
-            elif choice == '6':
+
+            elif choice == "6":
                 clean_files()
-                
-            elif choice == '7':
+
+            elif choice == "7":
                 show_help()
-                
-            elif choice == '8':
+
+            elif choice == "8":
                 print("\n👋 Thanks for using TMUX Ultimate!")
                 print("   Happy tmux-ing! 🚀")
                 break
-                
+
             else:
                 print("❌ Invalid choice. Please enter a number between 1-8.")
-                
+
         except KeyboardInterrupt:
             print("\n\n👋 Goodbye!")
             break
         except Exception as e:
             print(f"\n❌ An error occurred: {e}")
-        
+
         # Pause before showing menu again
-        if choice in ['1', '2', '3', '4', '5', '6', '7']:
+        if choice in ["1", "2", "3", "4", "5", "6", "7"]:
             input("\n📎 Press Enter to continue...")
 
 
