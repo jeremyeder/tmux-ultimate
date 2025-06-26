@@ -20,7 +20,7 @@ tmux-ultimate is a Python-based interactive configuration generator that helps y
 
 ## Quick Start
 
-1. **Install prerequisites**: Python 3.6+, tmux 2.1+, git
+1. **Install prerequisites**: Python 3.11+, tmux 2.1+, git
 2. **Get tmux-ultimate**: [See Installation Guide](installation.md)
 3. **Run the questionnaire**: `python3 tmux_ultimate.py`
 4. **Apply configuration**: Configuration is automatically saved to `~/.tmux.conf`
