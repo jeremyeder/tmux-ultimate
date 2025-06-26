@@ -9,7 +9,7 @@ sidebar_position: 2
 Before installing tmux-ultimate, ensure you have the following installed:
 
 ### Required
-- **Python 3.6+**: The questionnaire tool is written in Python
+- **Python 3.11+**: The questionnaire tool is written in Python
 - **tmux 2.1+**: The terminal multiplexer we're configuring
 - **Git**: To clone the repository
 

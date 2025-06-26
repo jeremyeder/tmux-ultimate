@@ -1,0 +1,289 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request:
+    types: [opened, closed, ready_for_review, converted_to_draft]
+
+env:
+  PROJECT_ID: PVT_kwHOAB1KmM4A8a_g
+  STATUS_FIELD_ID: PVTSSF_lAHOAB1KmM4A8a_gzgwbRMQ
+  BACKLOG_OPTION_ID: 438d1e7d
+  READY_OPTION_ID: 5f99e732
+  IN_PROGRESS_OPTION_ID: 16f24511
+  REVIEW_OPTION_ID: eee034b5
+  DONE_OPTION_ID: 246b6383
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    
+    steps:
+    - name: Add issue to project
+      uses: actions/add-to-project@v0.4.0
+      with:
+        project-url: https://github.com/users/jeremyeder/projects/2
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  move-to-in-progress:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'ready_for_review')
+    
+    steps:
+    - name: Move linked issues to In Progress
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const pr = context.payload.pull_request;
+          const body = pr.body || '';
+          
+          // Extract issue numbers from PR body (looks for "Closes #123", "Fixes #123", etc.)
+          const issuePattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+          const matches = [...body.matchAll(issuePattern)];
+          
+          console.log(`Found ${matches.length} linked issues in PR #${pr.number}`);
+          
+          for (const match of matches) {
+            const issueNumber = parseInt(match[1]);
+            console.log(`Processing issue #${issueNumber}`);
+            
+            try {
+              // Get project items for this issue
+              const query = `
+                query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      projectItems(first: 10) {
+                        nodes {
+                          id
+                          project {
+                            id
+                            title
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const result = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issueNumber: issueNumber
+              });
+              
+              // Update status for items in our project
+              for (const item of result.repository.issue.projectItems.nodes) {
+                if (item.project.id === process.env.PROJECT_ID) {
+                  console.log(`Updating project item ${item.id} to In Progress`);
+                  
+                  const updateMutation = `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                      updateProjectV2ItemFieldValue(
+                        input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: { singleSelectOptionId: $optionId }
+                        }
+                      ) {
+                        projectV2Item {
+                          id
+                        }
+                      }
+                    }
+                  `;
+                  
+                  await github.graphql(updateMutation, {
+                    projectId: process.env.PROJECT_ID,
+                    itemId: item.id,
+                    fieldId: process.env.STATUS_FIELD_ID,
+                    optionId: process.env.IN_PROGRESS_OPTION_ID
+                  });
+                  
+                  console.log(`Successfully moved issue #${issueNumber} to In Progress`);
+                }
+              }
+              
+            } catch (error) {
+              console.log(`Error processing issue #${issueNumber}:`, error.message);
+            }
+          }
+
+  move-to-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'ready_for_review'
+    
+    steps:
+    - name: Move linked issues to Review
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const pr = context.payload.pull_request;
+          const body = pr.body || '';
+          
+          // Extract issue numbers from PR body
+          const issuePattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+          const matches = [...body.matchAll(issuePattern)];
+          
+          console.log(`PR #${pr.number} ready for review. Moving ${matches.length} linked issues to Review.`);
+          
+          for (const match of matches) {
+            const issueNumber = parseInt(match[1]);
+            console.log(`Processing issue #${issueNumber}`);
+            
+            try {
+              // Get project items for this issue
+              const query = `
+                query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      projectItems(first: 10) {
+                        nodes {
+                          id
+                          project {
+                            id
+                            title
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const result = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issueNumber: issueNumber
+              });
+              
+              // Update status for items in our project
+              for (const item of result.repository.issue.projectItems.nodes) {
+                if (item.project.id === process.env.PROJECT_ID) {
+                  console.log(`Updating project item ${item.id} to Review`);
+                  
+                  const updateMutation = `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                      updateProjectV2ItemFieldValue(
+                        input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: { singleSelectOptionId: $optionId }
+                        }
+                      ) {
+                        projectV2Item {
+                          id
+                        }
+                      }
+                    }
+                  `;
+                  
+                  await github.graphql(updateMutation, {
+                    projectId: process.env.PROJECT_ID,
+                    itemId: item.id,
+                    fieldId: process.env.STATUS_FIELD_ID,
+                    optionId: process.env.REVIEW_OPTION_ID
+                  });
+                  
+                  console.log(`Successfully moved issue #${issueNumber} to Review`);
+                }
+              }
+              
+            } catch (error) {
+              console.log(`Error processing issue #${issueNumber}:`, error.message);
+            }
+          }
+
+  move-to-done:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    
+    steps:
+    - name: Move linked issues to Done
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const pr = context.payload.pull_request;
+          const body = pr.body || '';
+          
+          // Extract issue numbers from PR body
+          const issuePattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+          const matches = [...body.matchAll(issuePattern)];
+          
+          console.log(`PR #${pr.number} merged. Moving ${matches.length} linked issues to Done.`);
+          
+          for (const match of matches) {
+            const issueNumber = parseInt(match[1]);
+            console.log(`Processing issue #${issueNumber}`);
+            
+            try {
+              // Get project items for this issue
+              const query = `
+                query($owner: String!, $repo: String!, $issueNumber: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $issueNumber) {
+                      projectItems(first: 10) {
+                        nodes {
+                          id
+                          project {
+                            id
+                            title
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              const result = await github.graphql(query, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issueNumber: issueNumber
+              });
+              
+              // Update status for items in our project
+              for (const item of result.repository.issue.projectItems.nodes) {
+                if (item.project.id === process.env.PROJECT_ID) {
+                  console.log(`Updating project item ${item.id} to Done`);
+                  
+                  const updateMutation = `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                      updateProjectV2ItemFieldValue(
+                        input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: { singleSelectOptionId: $optionId }
+                        }
+                      ) {
+                        projectV2Item {
+                          id
+                        }
+                      }
+                    }
+                  `;
+                  
+                  await github.graphql(updateMutation, {
+                    projectId: process.env.PROJECT_ID,
+                    itemId: item.id,
+                    fieldId: process.env.STATUS_FIELD_ID,
+                    optionId: process.env.DONE_OPTION_ID
+                  });
+                  
+                  console.log(`Successfully moved issue #${issueNumber} to Done`);
+                }
+              }
+              
+            } catch (error) {
+              console.log(`Error processing issue #${issueNumber}:`, error.message);
+            }
+          }
