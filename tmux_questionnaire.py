@@ -25,6 +25,7 @@ class ColorScheme(Enum):
     GRUVBOX = "gruvbox"
     SOLARIZED = "solarized"
     CATPPUCCIN = "catppuccin"
+    LFGM = "lfgm"
     CUSTOM = "custom"
 
 
@@ -435,29 +436,50 @@ class TmuxQuestionnaire:
             setattr(self.config, key, answer)
     
     def _ask_yes_no(self, question: str, default: bool = False, help_key: str = None) -> bool:
-        """Ask a yes/no question"""
+        """Ask a yes/no question with error handling"""
         default_str = "Y/n" if default else "y/N"
-        while True:
-            response = input(f"{question} [{default_str}] (? for help): ").strip().lower()
-            if response == '?' and help_key:
-                self._show_help(help_key)
-                continue
-            if not response:
-                return default
-            if response in ['y', 'yes']:
-                return True
-            if response in ['n', 'no']:
-                return False
-            print("Please enter 'y' or 'n' (or '?' for help)")
+        max_attempts = 5
+        attempt = 0
+        
+        while attempt < max_attempts:
+            try:
+                response = input(f"{question} [{default_str}] (? for help): ").strip().lower()
+                if response == '?' and help_key:
+                    self._show_help(help_key)
+                    continue
+                if not response:
+                    return default
+                if response in ['y', 'yes', '1', 'true']:
+                    return True
+                if response in ['n', 'no', '0', 'false']:
+                    return False
+                print("Please enter 'y' or 'n' (or '?' for help)")
+                attempt += 1
+            except (EOFError, KeyboardInterrupt):
+                print("\n\nOperation cancelled by user.")
+                raise KeyboardInterrupt("User cancelled operation")
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                attempt += 1
+        
+        print(f"Too many invalid attempts. Using default: {'yes' if default else 'no'}")
+        return default
     
     def _ask_choice(self, question: str, choices: List[tuple], default: Any = None, help_key: str = None) -> Any:
-        """Ask a multiple choice question"""
+        """Ask a multiple choice question with error handling"""
+        if not choices:
+            print("Error: No choices provided")
+            return default
+            
         print(f"\n{question}")
         for i, (value, description) in enumerate(choices, 1):
             marker = " (default)" if value == default else ""
             print(f"  {i}. {description}{marker}")
         
-        while True:
+        max_attempts = 5
+        attempt = 0
+        
+        while attempt < max_attempts:
             try:
                 response = input(f"Choose option [1-{len(choices)}] (? for help): ").strip()
                 if response == '?' and help_key:
@@ -561,29 +583,63 @@ class TmuxQuestionnaire:
                 self._show_help(help_key)
                 continue
             return response if response else default
+    
+    def _save_config(self, partial: bool = False) -> bool:
+        """Save configuration to JSON file with error handling"""
+        try:
+            # Save configuration to JSON for the generator
+            config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+            backup_path = config_path + '.backup' if partial else None
+            
+            # If this is a partial save, keep a backup
+            if partial and os.path.exists(config_path):
+                import shutil
+                shutil.copy2(config_path, backup_path)
+            
+            with open(config_path, 'w') as f:
+                json.dump(asdict(self.config), f, indent=2)
+            
+            return True
+            
+        except (IOError, OSError, PermissionError) as e:
+            print(f"⚠️  Warning: Could not save configuration: {e}")
+            return False
+        except Exception as e:
+            print(f"⚠️  Warning: Unexpected error saving configuration: {e}")
+            return False
 
 
 def main():
     """Main function to run the questionnaire"""
-    questionnaire = TmuxQuestionnaire()
-    config = questionnaire.run_questionnaire()
-    
-    print("\n" + "=" * 60)
-    print("🎉 Configuration complete!")
-    print("=" * 60)
-    
-    # Save configuration to JSON for the generator
-    config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
-    with open(config_path, 'w') as f:
-        json.dump(asdict(config), f, indent=2)
-    
-    print(f"Configuration saved to: {config_path}")
-    print("\nNext steps:")
-    print("1. Run the tmux config generator to create your .tmux.conf file")
-    print("2. Copy the generated config to ~/.tmux.conf")
-    print("3. Reload tmux or start a new session to apply changes")
-    
-    return config
+    try:
+        questionnaire = TmuxQuestionnaire()
+        config = questionnaire.run_questionnaire()
+        
+        print("\n" + "=" * 60)
+        print("🎉 Configuration complete!")
+        print("=" * 60)
+        
+        # Save configuration using the error-handling method
+        if questionnaire._save_config():
+            config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+            print(f"Configuration saved to: {config_path}")
+            print("\nNext steps:")
+            print("1. Run the tmux config generator to create your .tmux.conf file")
+            print("2. Copy the generated config to ~/.tmux.conf")
+            print("3. Reload tmux or start a new session to apply changes")
+        else:
+            print("⚠️  Configuration could not be saved. Please check file permissions.")
+        
+        return config
+        
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Questionnaire interrupted by user.")
+        print("Configuration may be incomplete. Run again to complete setup.")
+        return None
+    except Exception as e:
+        print(f"\n❌ An unexpected error occurred: {e}")
+        print("Please try running the questionnaire again.")
+        return None
 
 
 if __name__ == "__main__":

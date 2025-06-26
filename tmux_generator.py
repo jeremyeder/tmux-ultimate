@@ -15,10 +15,22 @@ class TmuxConfigGenerator:
     """Generate tmux configuration file from questionnaire responses"""
     
     def __init__(self, config_data: Dict):
-        self.config = config_data
-        self.lines = []
+        # Initialize color schemes first (needed for validation)
+        self._initialize_color_schemes()
         
-        # Color schemes definitions
+        # Validate and sanitize input config
+        if config_data is None:
+            config_data = {}
+        
+        if not isinstance(config_data, dict):
+            raise TypeError(f"Config data must be a dictionary, got {type(config_data)}")
+        
+        # Create a sanitized copy to avoid modifying the original
+        self.config = self._sanitize_config(config_data)
+        self.lines = []
+    
+    def _initialize_color_schemes(self):
+        """Initialize color schemes definitions"""
         self.color_schemes = {
             "dracula": {
                 "bg": "#282a36",
@@ -125,6 +137,80 @@ class TmuxConfigGenerator:
             }
         }
     
+    def _sanitize_config(self, config_data: Dict) -> Dict:
+        """Sanitize and validate configuration data with safe defaults"""
+        # Define safe defaults for all configuration options
+        defaults = {
+            'prefix_key': 'C-b',
+            'custom_prefix': '',
+            'enable_mouse': True,
+            'color_scheme': 'default',
+            'show_time': True,
+            'show_date': True,
+            'show_hostname': False,
+            'show_session_name': True,
+            'status_position': 'bottom',
+            'history_limit': 5000,
+            'automatic_rename': False,
+            'renumber_windows': True,
+            'base_index': 1,
+            'pane_base_index': 1,
+            'terminal_mode': 'emacs',
+            'enable_256_colors': True,
+            'enable_true_colors': True,
+            'vim_navigation': False,
+            'vim_copy_mode': False,
+            'use_tpm': False,
+            'plugins': [],
+            'enable_copy_paste': False,
+            'enable_pane_synchronization': False,
+            'enable_logging': False
+        }
+        
+        # Start with defaults
+        sanitized = defaults.copy()
+        
+        # Safely overlay user config
+        for key, value in config_data.items():
+            if key in defaults:
+                # Type validation based on defaults
+                expected_type = type(defaults[key])
+                if isinstance(value, expected_type):
+                    sanitized[key] = value
+                else:
+                    print(f"⚠️  Warning: Invalid type for '{key}' (expected {expected_type.__name__}, got {type(value).__name__}). Using default.")
+            else:
+                print(f"⚠️  Warning: Unknown configuration key '{key}' ignored.")
+        
+        # Additional validation for specific values
+        if sanitized['color_scheme'] not in self.color_schemes and sanitized['color_scheme'] != 'default':
+            print(f"⚠️  Warning: Unknown color scheme '{sanitized['color_scheme']}'. Using default.")
+            sanitized['color_scheme'] = 'default'
+        
+        if sanitized['history_limit'] < 100 or sanitized['history_limit'] > 1000000:
+            print(f"⚠️  Warning: History limit {sanitized['history_limit']} out of range (100-1000000). Using 5000.")
+            sanitized['history_limit'] = 5000
+        
+        if sanitized['base_index'] not in [0, 1]:
+            print(f"⚠️  Warning: Invalid base_index {sanitized['base_index']}. Using 1.")
+            sanitized['base_index'] = 1
+            sanitized['pane_base_index'] = 1
+        
+        if sanitized['terminal_mode'] not in ['emacs', 'vi']:
+            print(f"⚠️  Warning: Invalid terminal_mode '{sanitized['terminal_mode']}'. Using 'emacs'.")
+            sanitized['terminal_mode'] = 'emacs'
+        
+        if sanitized['status_position'] not in ['top', 'bottom']:
+            print(f"⚠️  Warning: Invalid status_position '{sanitized['status_position']}'. Using 'bottom'.")
+            sanitized['status_position'] = 'bottom'
+        
+        # Ensure plugins is a list
+        if not isinstance(sanitized['plugins'], list):
+            print(f"⚠️  Warning: Plugins must be a list, got {type(sanitized['plugins'])}. Using empty list.")
+            sanitized['plugins'] = []
+        
+        return sanitized
+    
     def generate_config(self) -> str:
         """Generate the complete tmux configuration"""
         self._add_header()
@@ -168,12 +254,18 @@ class TmuxConfigGenerator:
         if prefix == 'custom':
             prefix = self.config.get('custom_prefix', 'C-b')
         
+        # Always set the prefix explicitly for clarity
+        self.lines.extend([
+            "# Set prefix key",
+            f"set -g prefix {prefix}",
+            ""
+        ])
+        
         if prefix != 'C-b':
             self.lines.extend([
-                "# Change prefix key",
+                "# Unbind default prefix and set new prefix",
                 "unbind C-b",
-                f"set-option -g prefix {prefix}",
-                f"bind-key {prefix} send-prefix",
+                f"bind {prefix} send-prefix",
                 ""
             ])
         
@@ -211,12 +303,11 @@ class TmuxConfigGenerator:
         
         # Status bar position
         position = self.config.get('status_position', 'bottom')
-        if position != 'bottom':
-            self.lines.extend([
-                f"# Status bar position",
-                f"set -g status-position {position}",
-                ""
-            ])
+        self.lines.extend([
+            f"# Status bar position",
+            f"set -g status-position {position}",
+            ""
+        ])
         
         # Color scheme
         color_scheme = self.config.get('color_scheme', 'default')
