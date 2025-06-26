@@ -9,6 +9,7 @@ import os
 import subprocess
 import argparse
 from pathlib import Path
+from typing import Optional
 
 
 def print_banner():
