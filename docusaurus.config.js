@@ -55,6 +55,15 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 4,
+      },
       navbar: {
         title: 'tmux-ultimate',
         items: [
@@ -62,12 +71,7 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
-          },
-          {
-            href: 'https://github.com/jeremyeder/tmux-ultimate',
-            label: 'GitHub',
-            position: 'right',
+            label: 'Docs',
           },
         ],
       },
