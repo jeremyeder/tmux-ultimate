@@ -583,29 +583,63 @@ class TmuxQuestionnaire:
                 self._show_help(help_key)
                 continue
             return response if response else default
+    
+    def _save_config(self, partial: bool = False) -> bool:
+        """Save configuration to JSON file with error handling"""
+        try:
+            # Save configuration to JSON for the generator
+            config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+            backup_path = config_path + '.backup' if partial else None
+            
+            # If this is a partial save, keep a backup
+            if partial and os.path.exists(config_path):
+                import shutil
+                shutil.copy2(config_path, backup_path)
+            
+            with open(config_path, 'w') as f:
+                json.dump(asdict(self.config), f, indent=2)
+            
+            return True
+            
+        except (IOError, OSError, PermissionError) as e:
+            print(f"⚠️  Warning: Could not save configuration: {e}")
+            return False
+        except Exception as e:
+            print(f"⚠️  Warning: Unexpected error saving configuration: {e}")
+            return False
 
 
 def main():
     """Main function to run the questionnaire"""
-    questionnaire = TmuxQuestionnaire()
-    config = questionnaire.run_questionnaire()
-    
-    print("\n" + "=" * 60)
-    print("🎉 Configuration complete!")
-    print("=" * 60)
-    
-    # Save configuration to JSON for the generator
-    config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
-    with open(config_path, 'w') as f:
-        json.dump(asdict(config), f, indent=2)
-    
-    print(f"Configuration saved to: {config_path}")
-    print("\nNext steps:")
-    print("1. Run the tmux config generator to create your .tmux.conf file")
-    print("2. Copy the generated config to ~/.tmux.conf")
-    print("3. Reload tmux or start a new session to apply changes")
-    
-    return config
+    try:
+        questionnaire = TmuxQuestionnaire()
+        config = questionnaire.run_questionnaire()
+        
+        print("\n" + "=" * 60)
+        print("🎉 Configuration complete!")
+        print("=" * 60)
+        
+        # Save configuration using the error-handling method
+        if questionnaire._save_config():
+            config_path = os.path.join(os.path.dirname(__file__), 'tmux_config.json')
+            print(f"Configuration saved to: {config_path}")
+            print("\nNext steps:")
+            print("1. Run the tmux config generator to create your .tmux.conf file")
+            print("2. Copy the generated config to ~/.tmux.conf")
+            print("3. Reload tmux or start a new session to apply changes")
+        else:
+            print("⚠️  Configuration could not be saved. Please check file permissions.")
+        
+        return config
+        
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Questionnaire interrupted by user.")
+        print("Configuration may be incomplete. Run again to complete setup.")
+        return None
+    except Exception as e:
+        print(f"\n❌ An unexpected error occurred: {e}")
+        print("Please try running the questionnaire again.")
+        return None
 
 
 if __name__ == "__main__":
