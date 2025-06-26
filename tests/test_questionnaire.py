@@ -4,8 +4,7 @@ Tests for tmux_questionnaire.py
 """
 
 import pytest
-import json
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open
 from tmux_questionnaire import TmuxQuestionnaire, TmuxConfig
 
 

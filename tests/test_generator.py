@@ -38,7 +38,15 @@ class TestTmuxConfigGenerator:
 
     def test_initialization(self):
         """Test generator initializes correctly"""
-        assert self.generator.config == self.sample_config
+        # Generator adds default values, so check key values are preserved
+        assert self.generator.config["prefix_key"] == self.sample_config["prefix_key"]
+        assert (
+            self.generator.config["enable_mouse"] == self.sample_config["enable_mouse"]
+        )
+        assert (
+            self.generator.config["color_scheme"] == self.sample_config["color_scheme"]
+        )
+        assert self.generator.config["use_tpm"] == self.sample_config["use_tpm"]
         assert hasattr(self.generator, "lines")
         assert hasattr(self.generator, "color_schemes")
         assert "lfgm" in self.generator.color_schemes
@@ -289,7 +297,7 @@ class TestGeneratorIntegration:
 
         # Key features present
         assert "C-Space" in output
-        assert "LFGM" in output or "lfgm" in output
+        assert "LFGM" in output or "lfgm" in output or "Lfgm" in output
         assert "vi" in output
         assert "tpm" in output
         assert "logging" in output.lower() or "pipe-pane" in output

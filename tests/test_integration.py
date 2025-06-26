@@ -4,11 +4,10 @@ Integration tests for the complete tmux-ultimate workflow
 """
 
 import pytest
-import json
-from unittest.mock import patch, mock_open, MagicMock
+from unittest.mock import patch, mock_open
 
 # Import the modules we're testing
-from tmux_questionnaire import TmuxQuestionnaire, TmuxConfig
+from tmux_questionnaire import TmuxQuestionnaire
 from tmux_generator import TmuxConfigGenerator
 
 
@@ -330,7 +329,14 @@ class TestPerformance:
         """Test questionnaire completes in reasonable time"""
         import time
 
-        mock_responses = ["1"] * 30  # Answer 1 to all questions with generous buffer
+        # Mix of valid responses that work for all question types
+        mock_responses = (
+            ["1"] * 10  # Multiple choice questions
+            + ["5000"] * 5  # History limit and other numeric questions
+            + ["y"] * 10  # Yes/no questions
+            + ["n"] * 10  # More yes/no questions
+            + ["1"] * 15  # Fallback multiple choice
+        )
 
         start_time = time.time()
 
