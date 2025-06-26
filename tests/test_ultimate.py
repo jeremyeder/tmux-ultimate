@@ -119,8 +119,8 @@ class TestExistingConfigDetection:
     )
     @patch("builtins.open", new_callable=mock_open, read_data="set -g prefix C-a")
     @patch(
-        "builtins.input", side_effect=["2", "/tmp/test.conf"]
-    )  # Custom path option  # nosec
+        "builtins.input", side_effect=["2", "/tmp/test.conf"]  # nosec
+    )  # Custom path option
     @patch("os.access", return_value=True)
     def test_existing_config_custom_path(
         self, mock_access, mock_input, mock_file, mock_exists
@@ -164,8 +164,8 @@ class TestArgumentParsing:
     def test_parse_arguments_long_output(self):
         """Test long form output argument"""
         with patch(
-            "sys.argv", ["tmux_ultimate.py", "--output", "/tmp/custom.conf"]
-        ):  # nosec
+            "sys.argv", ["tmux_ultimate.py", "--output", "/tmp/custom.conf"]  # nosec
+        ):
             args = parse_arguments()
             assert args.output == "/tmp/custom.conf"  # nosec
 

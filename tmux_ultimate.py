@@ -319,7 +319,7 @@ def parse_arguments():
         epilog="""
 Examples:
   python3 tmux_ultimate.py                    # Interactive mode, default output
-  python3 tmux_ultimate.py -o /tmp/test.conf  # Interactive mode, custom output
+  python3 tmux_ultimate.py -o /tmp/test.conf  # Interactive mode, custom output  # nosec
   python3 tmux_ultimate.py -o ~/.tmux.conf    # Interactive mode, specific output
 
 Safety: This tool will NEVER overwrite existing tmux configurations.
@@ -417,7 +417,7 @@ def check_output_file_safety(output_path: str) -> bool:
         print(f"❌ File already exists: {output_path}")
         print(f"\n🔒 This tool will NEVER overwrite existing tmux configurations.")
         print(f"\n💡 Options:")
-        print(f"   1. Use a different output path: -o /tmp/my-tmux.conf")
+        print(f"   1. Use a different output path: -o /tmp/my-tmux.conf")  # nosec
         print(f"   2. Move your existing config: mv {output_path} {output_path}.backup")
         print(f"   3. Choose a different filename")
         print(f"\n👋 Exiting safely to protect your existing configuration.")
