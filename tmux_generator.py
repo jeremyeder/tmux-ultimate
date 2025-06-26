@@ -29,7 +29,7 @@ class TmuxConfigGenerator:
 
         # Create a sanitized copy to avoid modifying the original
         self.config = self._sanitize_config(config_data)
-        self.lines = []
+        self.lines: List[str] = []
 
     def _initialize_color_schemes(self):
         """Initialize color schemes definitions"""

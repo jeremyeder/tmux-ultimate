@@ -45,7 +45,7 @@ class TmuxConfig:
 
     # Appearance
     color_scheme: str = "default"
-    custom_colors: Dict[str, str] = None
+    custom_colors: Optional[Dict[str, str]] = None
     show_time: bool = True
     show_date: bool = True
     show_hostname: bool = False
@@ -70,11 +70,11 @@ class TmuxConfig:
 
     # Plugins
     use_tpm: bool = True
-    plugins: List[str] = None
+    plugins: Optional[List[str]] = None
 
     # Advanced Features
     enable_copy_paste: bool = False
-    custom_key_bindings: List[Dict[str, str]] = None
+    custom_key_bindings: Optional[List[Dict[str, str]]] = None
     status_position: str = "bottom"
 
     # Development Features
@@ -445,21 +445,21 @@ class TmuxQuestionnaire:
             setattr(self.config, key, answers)
 
         elif question_type == "number":
-            default = question.get("default", 0)
+            default_num = question.get("default", 0)
             min_val = question.get("min", 0)
             max_val = question.get("max", 999999)
             answer = self._ask_number(
-                question_text, default, min_val, max_val, help_key
+                question_text, default_num, min_val, max_val, help_key
             )
             setattr(self.config, key, answer)
 
         elif question_type == "text":
-            default = question.get("default", "")
-            answer = self._ask_text(question_text, default, help_key)
+            default_text = question.get("default", "")
+            answer = self._ask_text(question_text, default_text, help_key)
             setattr(self.config, key, answer)
 
     def _ask_yes_no(
-        self, question: str, default: bool = False, help_key: str = None
+        self, question: str, default: bool = False, help_key: Optional[str] = None
     ) -> bool:
         """Ask a yes/no question with error handling"""
         default_str = "Y/n" if default else "y/N"
@@ -497,7 +497,7 @@ class TmuxQuestionnaire:
         question: str,
         choices: List[tuple],
         default: Any = None,
-        help_key: str = None,
+        help_key: Optional[str] = None,
     ) -> Any:
         """Ask a multiple choice question with error handling"""
         if not choices:
@@ -536,7 +536,7 @@ class TmuxQuestionnaire:
         question: str,
         choices: List[tuple],
         default: Any = None,
-        help_key: str = None,
+        help_key: Optional[str] = None,
     ) -> Any:
         """Ask a multiple choice question with colored options for color schemes"""
         print(f"\n{question}")
@@ -571,7 +571,7 @@ class TmuxQuestionnaire:
                 print("Please enter a valid number (or '?' for help)")
 
     def _ask_multiselect(
-        self, question: str, choices: List[tuple], help_key: str = None
+        self, question: str, choices: List[tuple], help_key: Optional[str] = None
     ) -> List[str]:
         """Ask a multiple selection question"""
         print(f"\n{question}")
@@ -611,7 +611,7 @@ class TmuxQuestionnaire:
         default: int,
         min_val: int,
         max_val: int,
-        help_key: str = None,
+        help_key: Optional[str] = None,
     ) -> int:
         """Ask for a numeric input"""
         while True:
@@ -631,7 +631,9 @@ class TmuxQuestionnaire:
             except ValueError:
                 print("Please enter a valid number (or '?' for help)")
 
-    def _ask_text(self, question: str, default: str = "", help_key: str = None) -> str:
+    def _ask_text(
+        self, question: str, default: str = "", help_key: Optional[str] = None
+    ) -> str:
         """Ask for text input"""
         while True:
             response = input(f"{question} [{default}] (? for help): ").strip()
@@ -645,12 +647,12 @@ class TmuxQuestionnaire:
         try:
             # Save configuration to JSON for the generator
             config_path = os.path.join(os.path.dirname(__file__), "tmux_config.json")
-            backup_path = config_path + ".backup" if partial else None
 
             # If this is a partial save, keep a backup
             if partial and os.path.exists(config_path):
                 import shutil
 
+                backup_path = config_path + ".backup"
                 shutil.copy2(config_path, backup_path)
 
             with open(config_path, "w") as f:

@@ -81,7 +81,7 @@ def run_questionnaire():
         return None
 
 
-def generate_config(output_path: str = None):
+def generate_config(output_path: Optional[str] = None):
     """Generate the tmux configuration"""
     print("\n⚙️ Generating TMUX Configuration...")
     try:
