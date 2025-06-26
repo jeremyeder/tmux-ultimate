@@ -611,8 +611,6 @@ class TmuxConfigGenerator:
             return
 
         plugins = self.config.get("plugins", [])
-        if not plugins:
-            return
 
         self.lines.extend(
             [

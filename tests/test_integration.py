@@ -330,7 +330,7 @@ class TestPerformance:
         """Test questionnaire completes in reasonable time"""
         import time
 
-        mock_responses = ["1"] * 25  # Answer 1 to all questions with extra buffer
+        mock_responses = ["1"] * 30  # Answer 1 to all questions with generous buffer
 
         start_time = time.time()
 

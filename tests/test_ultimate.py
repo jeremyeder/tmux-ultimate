@@ -119,8 +119,8 @@ class TestExistingConfigDetection:
     )
     @patch("builtins.open", new_callable=mock_open, read_data="set -g prefix C-a")
     @patch(
-        "builtins.input", side_effect=["2", "/tmp/test.conf"]  # nosec
-    )  # Custom path option
+        "builtins.input", side_effect=["2", "/tmp/test.conf", "1", "1"]  # nosec
+    )  # Custom path option with buffer
     @patch("os.access", return_value=True)
     def test_existing_config_custom_path(
         self, mock_access, mock_input, mock_file, mock_exists
@@ -134,8 +134,8 @@ class TestExistingConfigDetection:
     )
     @patch("builtins.open", new_callable=mock_open, read_data="set -g prefix C-a")
     @patch(
-        "builtins.input", side_effect=["2", "", "/tmp/valid.conf"]  # nosec
-    )  # Empty then valid path
+        "builtins.input", side_effect=["2", "", "/tmp/valid.conf", "1", "1"]  # nosec
+    )  # Empty then valid path with buffer
     @patch("os.access", return_value=True)
     def test_existing_config_invalid_then_valid_path(
         self, mock_access, mock_input, mock_file, mock_exists
