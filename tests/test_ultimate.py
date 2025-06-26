@@ -5,7 +5,6 @@ Tests for tmux_ultimate.py
 
 import pytest
 import os
-import tempfile
 from unittest.mock import patch, mock_open, MagicMock
 from tmux_ultimate import (
     check_python_version,

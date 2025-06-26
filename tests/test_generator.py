@@ -4,8 +4,6 @@ Tests for tmux_generator.py
 """
 
 import pytest
-import json
-from unittest.mock import patch, mock_open
 from tmux_generator import TmuxConfigGenerator
 
 

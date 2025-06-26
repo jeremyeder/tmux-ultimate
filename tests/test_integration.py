@@ -4,8 +4,6 @@ Integration tests for the complete tmux-ultimate workflow
 """
 
 import pytest
-import os
-import tempfile
 import json
 from unittest.mock import patch, mock_open, MagicMock
 
