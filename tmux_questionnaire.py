@@ -448,15 +448,15 @@ class TmuxQuestionnaire:
             default_num = question.get("default", 0)
             min_val = question.get("min", 0)
             max_val = question.get("max", 999999)
-            answer = self._ask_number(
+            answer_num = self._ask_number(
                 question_text, default_num, min_val, max_val, help_key
             )
-            setattr(self.config, key, answer)
+            setattr(self.config, key, answer_num)
 
         elif question_type == "text":
             default_text = question.get("default", "")
-            answer = self._ask_text(question_text, default_text, help_key)
-            setattr(self.config, key, answer)
+            answer_text = self._ask_text(question_text, default_text, help_key)
+            setattr(self.config, key, answer_text)
 
     def _ask_yes_no(
         self, question: str, default: bool = False, help_key: Optional[str] = None

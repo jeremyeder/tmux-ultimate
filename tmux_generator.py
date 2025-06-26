@@ -196,7 +196,9 @@ class TmuxConfigGenerator:
             )
             sanitized["color_scheme"] = "default"
 
-        if sanitized["history_limit"] < 100 or sanitized["history_limit"] > 1000000:
+        if isinstance(sanitized["history_limit"], int) and (
+            sanitized["history_limit"] < 100 or sanitized["history_limit"] > 1000000
+        ):
             print(
                 f"⚠️  Warning: History limit {sanitized['history_limit']} out of range (100-1000000). Using 5000."
             )
