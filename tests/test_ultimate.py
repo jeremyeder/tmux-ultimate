@@ -241,9 +241,7 @@ class TestErrorHandling:
                 # This would test the actual config validation
                 # Each config should either be valid type or handled gracefully
                 is_valid = (
-                    config is None
-                    or config == ""
-                    or isinstance(config, (dict, list))
+                    config is None or config == "" or isinstance(config, (dict, list))
                 )
                 assert is_valid, f"Config {config} should be handled gracefully"
             except Exception as e:
