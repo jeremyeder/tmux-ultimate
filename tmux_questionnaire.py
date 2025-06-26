@@ -147,6 +147,7 @@ class TmuxQuestionnaire:
                             ("gruvbox", "Gruvbox theme"),
                             ("solarized", "Solarized theme"),
                             ("catppuccin", "Catppuccin theme"),
+                            ("lfgm", "LFGM (New York Mets)"),
                             ("custom", "Custom colors")
                         ],
                         "default": "default",
@@ -331,7 +332,7 @@ class TmuxQuestionnaire:
             "prefix_key": "The prefix key is pressed before all tmux commands. Default is Ctrl+B, but many users prefer Ctrl+A (like GNU Screen) or Ctrl+Space for easier typing.",
             "custom_prefix": "Enter a custom prefix key using tmux syntax (e.g., 'C-x' for Ctrl+X, 'M-a' for Alt+A).",
             "enable_mouse": "Mouse support allows you to click to select panes/windows, drag to resize panes, and scroll with the mouse wheel. Useful for beginners but some power users prefer keyboard-only.",
-            "color_scheme": "Choose a color theme for tmux. This affects the status bar, pane borders, and window indicators. Popular themes include Dracula (dark purple), Nord (blue-gray), and Gruvbox (retro).",
+            "color_scheme": "Choose a color theme for tmux. This affects the status bar, pane borders, and window indicators. Popular themes include Dracula (dark purple), Nord (blue-gray), Gruvbox (retro), and LFGM (New York Mets blue and orange).",
             "show_time": "Display current time (HH:MM format) in the status bar. Useful for keeping track of time while working in terminal.",
             "show_date": "Display current date (YYYY-MM-DD format) in the status bar alongside or instead of time.",
             "show_hostname": "Display the hostname/computer name in status bar. Useful when working on multiple remote servers.",
@@ -361,6 +362,7 @@ class TmuxQuestionnaire:
             "gruvbox": {"bg": "\033[48;2;40;40;40m", "fg": "\033[38;2;235;219;178m", "accent": "\033[38;2;214;93;14m"},
             "solarized": {"bg": "\033[48;2;0;43;54m", "fg": "\033[38;2;131;148;150m", "accent": "\033[38;2;38;139;210m"},
             "catppuccin": {"bg": "\033[48;2;30;30;46m", "fg": "\033[38;2;205;214;244m", "accent": "\033[38;2;203;166;247m"},
+            "lfgm": {"bg": "\033[48;2;0;45;114m", "fg": "\033[38;2;255;255;255m", "accent": "\033[38;2;255;103;31m"},
             "custom": {"bg": "\033[45m", "fg": "\033[37m", "accent": "\033[33m"}
         }
     

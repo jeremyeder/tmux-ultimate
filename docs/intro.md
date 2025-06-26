@@ -27,7 +27,7 @@ tmux-ultimate is a Python-based interactive configuration generator that helps y
 
 ## What's Included
 
-- **5 Visual Color Schemes**: [See color previews in Usage Guide](usage.md#question-types)
+- **6 Visual Color Schemes**: [See color previews in Usage Guide](usage.md#question-types)
 - **Essential Plugins**: Complete TPM integration with curated plugin set
 - **Vim Integration**: Seamless vim-style navigation and copy mode
 - **Power User Features**: Session logging, clipboard support, advanced bindings

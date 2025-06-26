@@ -74,6 +74,9 @@ Enable mouse support? (y/n) [default: y]:
   <div style={{backgroundColor: '#1e1e2e', color: '#cdd6f4', padding: '4px 8px', margin: '2px 0', borderRadius: '4px'}}>
     5. <span style={{backgroundColor: '#f5c2e7', color: '#1e1e2e', padding: '2px 6px', borderRadius: '3px', fontWeight: 'bold'}}> Catppuccin </span> (pastel theme)
   </div>
+  <div style={{backgroundColor: '#002d72', color: '#ffffff', padding: '4px 8px', margin: '2px 0', borderRadius: '4px'}}>
+    6. <span style={{backgroundColor: '#ff671f', color: '#ffffff', padding: '2px 6px', borderRadius: '3px', fontWeight: 'bold'}}> LFGM </span> (New York Mets)
+  </div>
   <div style={{marginTop: '8px', color: '#888'}}>Your choice [default: 1]:</div>
 </div>
 

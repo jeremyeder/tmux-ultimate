@@ -108,6 +108,20 @@ class TmuxConfigGenerator:
                 "base": "#1e1e2e",
                 "mantle": "#181825",
                 "crust": "#11111b"
+            },
+            "lfgm": {
+                "bg": "#002d72",
+                "fg": "#ffffff",
+                "primary_blue": "#002d72",
+                "primary_orange": "#ff671f", 
+                "secondary_blue": "#0047ab",
+                "secondary_orange": "#ff8c00",
+                "light_blue": "#4472c4",
+                "light_orange": "#ffa366",
+                "dark_blue": "#001a44",
+                "white": "#ffffff",
+                "black": "#000000",
+                "gray": "#cccccc"
             }
         }
     
@@ -267,6 +281,20 @@ class TmuxConfigGenerator:
                 f"set -g window-status-current-style 'bg={colors['mauve']},fg={colors['base']}'",
                 f"set -g pane-border-style 'fg={colors['surface0']}'",
                 f"set -g pane-active-border-style 'fg={colors['mauve']}'",
+                ""
+            ])
+        elif scheme == "lfgm":
+            self.lines.extend([
+                f"set -g status-bg '{colors['primary_blue']}'",
+                f"set -g status-fg '{colors['white']}'",
+                f"set -g window-status-current-style 'bg={colors['primary_orange']},fg={colors['white']}'",
+                f"set -g pane-border-style 'fg={colors['secondary_blue']}'",
+                f"set -g pane-active-border-style 'fg={colors['primary_orange']}'",
+                f"set -g status-left-style 'bg={colors['primary_orange']},fg={colors['white']}'",
+                f"set -g status-right-style 'bg={colors['light_blue']},fg={colors['white']}'",
+                f"set -g window-status-style 'bg={colors['secondary_blue']},fg={colors['white']}'",
+                f"set -g message-style 'bg={colors['primary_orange']},fg={colors['white']}'",
+                f"set -g message-command-style 'bg={colors['light_orange']},fg={colors['dark_blue']}'",
                 ""
             ])
     
