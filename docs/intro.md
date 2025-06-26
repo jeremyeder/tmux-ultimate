@@ -2,46 +2,36 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# TMUX Ultimate Configuration Generator
 
-Let's discover **tmux-ultimate in less than 5 minutes**.
+Welcome to **tmux-ultimate** - an interactive questionnaire tool that creates the perfect tmux configuration for Linux power users.
 
-## Getting Started
+## What is tmux-ultimate?
 
-Get started by **creating a new site**.
+tmux-ultimate is a Python-based interactive configuration generator that helps you create a personalized `.tmux.conf` file tailored to your workflow preferences. Instead of manually researching hundreds of tmux options, simply answer a series of targeted questions and get a production-ready configuration.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Key Features
 
-### What you'll need
+🚀 **Interactive Configuration** - Answer targeted questions instead of researching options  
+🎨 **Beautiful Color Schemes** - Choose from 5 carefully crafted themes with visual previews  
+⚙️ **Power User Focused** - Vim integration, TPM plugin management, and advanced features  
+🛡️ **Safe by Default** - Never overwrites existing configurations  
+📦 **Plugin Management** - Integrated TPM (Tmux Plugin Manager) support  
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+## Quick Start
 
-## Generate a new site
+1. **Install prerequisites**: Python 3.6+, tmux 2.1+, git
+2. **Get tmux-ultimate**: [See Installation Guide](installation.md)
+3. **Run the questionnaire**: `python3 tmux_ultimate.py`
+4. **Apply configuration**: Configuration is automatically saved to `~/.tmux.conf`
 
-Generate a new Docusaurus site using the **classic template**.
+## What's Included
 
-The classic template will automatically be added to your project after you run the command:
+- **5 Visual Color Schemes**: [See color previews in Usage Guide](usage.md#question-types)
+- **Essential Plugins**: Complete TPM integration with curated plugin set
+- **Vim Integration**: Seamless vim-style navigation and copy mode
+- **Power User Features**: Session logging, clipboard support, advanced bindings
+- **Help System**: Built-in help (`?`) for every configuration option
+- **Safety First**: Automatic backup of existing configurations
 
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Ready to create your ultimate tmux configuration? [Start with installation →](installation.md)

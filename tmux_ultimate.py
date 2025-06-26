@@ -331,6 +331,79 @@ If the target file exists, the tool will warn you and exit safely.
     return parser.parse_args()
 
 
+def check_existing_tmux_config() -> str:
+    """Check for existing tmux configuration and ask user what to do"""
+    default_config_path = os.path.expanduser("~/.tmux.conf")
+    
+    if os.path.exists(default_config_path):
+        print(f"\n🔍 EXISTING TMUX CONFIGURATION DETECTED!")
+        print(f"📁 Found: {default_config_path}")
+        
+        # Show a preview of the existing config
+        try:
+            with open(default_config_path, 'r') as f:
+                lines = f.readlines()[:5]  # Show first 5 lines
+                print(f"\n📄 Preview of existing configuration:")
+                for i, line in enumerate(lines, 1):
+                    print(f"   {i}: {line.rstrip()}")
+                if len(lines) == 5:
+                    print("   ...")
+        except Exception:
+            print("   (Unable to preview file)")
+        
+        print(f"\n🤔 What would you like to do?")
+        print(f"   1. 📦 Backup existing config and create new one")
+        print(f"   2. 📝 Use a different output location")
+        print(f"   3. 🚪 Exit (keep existing config unchanged)")
+        
+        while True:
+            try:
+                choice = input("\n🎯 Your choice (1-3): ").strip()
+                
+                if choice == '1':
+                    backup_path = f"{default_config_path}.backup.{__import__('datetime').datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                    os.rename(default_config_path, backup_path)
+                    print(f"✅ Existing config backed up to: {backup_path}")
+                    return default_config_path
+                
+                elif choice == '2':
+                    while True:
+                        new_path = input("\n📁 Enter new output path: ").strip()
+                        if not new_path:
+                            print("❌ Please enter a valid path")
+                            continue
+                        
+                        new_path = os.path.expanduser(new_path)
+                        if os.path.exists(new_path):
+                            print(f"❌ File already exists: {new_path}")
+                            continue
+                        
+                        # Check if directory exists and is writable
+                        output_dir = os.path.dirname(new_path)
+                        if output_dir and not os.path.exists(output_dir):
+                            print(f"❌ Directory does not exist: {output_dir}")
+                            continue
+                        
+                        if output_dir and not os.access(output_dir, os.W_OK):
+                            print(f"❌ Directory is not writable: {output_dir}")
+                            continue
+                        
+                        return new_path
+                
+                elif choice == '3':
+                    print("\n👋 Exiting to preserve your existing configuration.")
+                    sys.exit(0)
+                
+                else:
+                    print("❌ Please enter 1, 2, or 3")
+                    
+            except KeyboardInterrupt:
+                print("\n\n👋 Goodbye!")
+                sys.exit(0)
+    
+    return default_config_path
+
+
 def check_output_file_safety(output_path: str) -> bool:
     """Check if output file is safe to write (doesn't exist)"""
     if os.path.exists(output_path):
@@ -366,13 +439,23 @@ def main():
     if not check_dependencies():
         sys.exit(1)
     
-    # Safety check for output file
-    if not check_output_file_safety(args.output):
-        sys.exit(1)
-    
     print_banner()
-    print(f"\n📄 Output file: {args.output}")
-    print(f"🛡️  Safety verified: File does not exist - safe to proceed\n")
+    
+    # Check for existing config and get final output path
+    if args.output == os.path.expanduser("~/.tmux.conf"):
+        # Using default path, check for existing config
+        final_output = check_existing_tmux_config()
+    else:
+        # Using custom path, do normal safety check
+        if not check_output_file_safety(args.output):
+            sys.exit(1)
+        final_output = args.output
+    
+    print(f"\n📄 Output file: {final_output}")
+    print(f"🛡️  Safety verified: Ready to proceed\n")
+    
+    # Update args with the final output path
+    args.output = final_output
     
     while True:
         show_menu()

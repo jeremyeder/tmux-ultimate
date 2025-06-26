@@ -43,12 +43,6 @@ const config = {
           editUrl:
             'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
         },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
-        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -63,10 +57,6 @@ const config = {
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'tmux-ultimate',
-        logo: {
-          alt: 'tmux-ultimate Logo',
-          src: 'img/logo.svg',
-        },
         items: [
           {
             type: 'docSidebar',
@@ -74,58 +64,12 @@ const config = {
             position: 'left',
             label: 'Tutorial',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/jeremyeder/tmux-ultimate',
             label: 'GitHub',
             position: 'right',
           },
         ],
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Tutorial',
-                to: '/docs/intro',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Stack Overflow - TMUX',
-                href: 'https://stackoverflow.com/questions/tagged/tmux',
-              },
-              {
-                label: 'TMUX Wiki',
-                href: 'https://github.com/tmux/tmux/wiki',
-              },
-              {
-                label: 'TMUX Manual',
-                href: 'https://man.openbsd.org/tmux',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
-              {
-                label: 'GitHub',
-                href: 'https://github.com/jeremyeder/tmux-ultimate',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} tmux-ultimate. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,
