@@ -28,3 +28,19 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Hide the table of contents sidebar completely */
+.table-of-contents {
+  display: none !important;
+}
+
+/* Hide the TOC column entirely */
+.col--3 {
+  display: none !important;
+}
+
+/* Make the main content take full width */
+.col--9 {
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}

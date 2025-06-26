@@ -42,6 +42,8 @@ const config = {
           // Please change this to your repo.
           editUrl:
             'https://github.com/jeremyeder/tmux-ultimate/tree/main/',
+          showLastUpdateTime: true,
+          showLastUpdateAuthor: true,
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -63,6 +65,11 @@ const config = {
       tableOfContents: {
         minHeadingLevel: 2,
         maxHeadingLevel: 4,
+      },
+      colorMode: {
+        defaultMode: 'light',
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
       },
       navbar: {
         title: 'tmux-ultimate',
