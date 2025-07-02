@@ -180,6 +180,14 @@ class TmuxConfigGenerator:
             ""
         ])
         
+        # Pane border status - show current directory
+        self.lines.extend([
+            "# Pane border status - show current directory",
+            "set -g pane-border-status top",
+            "set -g pane-border-format '#P: #{b:pane_current_path}'",
+            ""
+        ])
+        
         # Color support
         if self.config.get('enable_256_colors', True):
             self.lines.extend([
@@ -230,7 +238,8 @@ class TmuxConfigGenerator:
                 f"set -g status-fg '{colors['fg']}'",
                 f"set -g window-status-current-style 'bg={colors['purple']},fg={colors['bg']}'",
                 f"set -g pane-border-style 'fg={colors['comment']}'",
-                f"set -g pane-active-border-style 'fg={colors['purple']}'",
+                f"set -g pane-active-border-style 'fg={colors['purple']},bg={colors['purple']}'",
+                f"set -g pane-border-format-style 'fg={colors['fg']},bg={colors['comment']}'",
                 ""
             ])
         elif scheme == "nord":
@@ -239,7 +248,8 @@ class TmuxConfigGenerator:
                 f"set -g status-fg '{colors['snow_storm_0']}'",
                 f"set -g window-status-current-style 'bg={colors['frost_3']},fg={colors['snow_storm_2']}'",
                 f"set -g pane-border-style 'fg={colors['polar_night_2']}'",
-                f"set -g pane-active-border-style 'fg={colors['frost_1']}'",
+                f"set -g pane-active-border-style 'fg={colors['frost_1']},bg={colors['frost_1']}'",
+                f"set -g pane-border-format-style 'fg={colors['snow_storm_2']},bg={colors['polar_night_1']}'",
                 ""
             ])
         elif scheme == "gruvbox":
@@ -248,7 +258,8 @@ class TmuxConfigGenerator:
                 f"set -g status-fg '{colors['fg']}'",
                 f"set -g window-status-current-style 'bg={colors['orange']},fg={colors['bg']}'",
                 f"set -g pane-border-style 'fg={colors['gray']}'",
-                f"set -g pane-active-border-style 'fg={colors['orange']}'",
+                f"set -g pane-active-border-style 'fg={colors['orange']},bg={colors['orange']}'",
+                f"set -g pane-border-format-style 'fg={colors['fg']},bg={colors['gray']}'",
                 ""
             ])
         elif scheme == "solarized":
@@ -257,7 +268,8 @@ class TmuxConfigGenerator:
                 f"set -g status-fg '{colors['base0']}'",
                 f"set -g window-status-current-style 'bg={colors['blue']},fg={colors['base3']}'",
                 f"set -g pane-border-style 'fg={colors['base01']}'",
-                f"set -g pane-active-border-style 'fg={colors['blue']}'",
+                f"set -g pane-active-border-style 'fg={colors['blue']},bg={colors['blue']}'",
+                f"set -g pane-border-format-style 'fg={colors['base3']},bg={colors['base01']}'",
                 ""
             ])
         elif scheme == "catppuccin":
@@ -266,7 +278,8 @@ class TmuxConfigGenerator:
                 f"set -g status-fg '{colors['text']}'",
                 f"set -g window-status-current-style 'bg={colors['mauve']},fg={colors['base']}'",
                 f"set -g pane-border-style 'fg={colors['surface0']}'",
-                f"set -g pane-active-border-style 'fg={colors['mauve']}'",
+                f"set -g pane-active-border-style 'fg={colors['mauve']},bg={colors['mauve']}'",
+                f"set -g pane-border-format-style 'fg={colors['text']},bg={colors['surface0']}'",
                 ""
             ])
     
